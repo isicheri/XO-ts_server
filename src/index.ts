@@ -1,19 +1,12 @@
 import express,{ Express } from "express";
 import http from "http";
-import { Server,Socket } from "socket.io";
+import { Server } from "socket.io";
 import { GameManager } from "./gameManager";
-import { join } from "path";
 
 const app:Express = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const gameManager = new GameManager();
-
-app.use(express.static("public"));
-
-app.get("/",(req,res) => {
-    res.sendFile(join("public","index.html"))
-})
 
 io.on('connecton',(socket) => {
 console.log("a user connected:",socket.username);
