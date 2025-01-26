@@ -9,7 +9,7 @@ export class GameManager {
 
     constructor() {
      this.board = [
-        [' ',' ' ,' '],
+        [' ',' ',' '],
         [' ',' ',' '],
         [' ',' ',' ']
     ];
