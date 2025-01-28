@@ -1,4 +1,4 @@
-import express,{ Express, Request, Response } from "express";
+import express,{ Express, request, Request, Response } from "express";
 import cors from "cors";
 import http from "http";
 import uuid from "uuidv4";
@@ -7,21 +7,19 @@ import { GameManager } from "./gameManager";
 
 const app:Express = express();
 const server = http.createServer(app);
+let globalReq: Request = request;
 const io = new Server(server,{
     cors: {
-        origin: ["http://localhost:5173/"]
+        origin: "*"
     }
 });
-app.use(cors({
-    origin:["http://localhost:5173/"],
-    allowedHeaders: []
-}))
 app.use(express.json())
 const gameManager = new GameManager();
-let rooms: {[roomId: string]: {creatorId: string,creator: string; players: string[]; spectators: string[]; gameState: {
+let rooms: {[roomId: string]: {creatorId: string,creator: string; players: string[]; spectators: string[]; userIp: string[];  gameState: {
     board: string[][],
     currentPlayer: number
 }}} = {};
+function returnUserIp()  {return globalReq.ip};
 
 app.get("/api_v1/:roomId", (req:Request,res:Response) => {
   const {roomId} = req.params;
@@ -47,12 +45,14 @@ socket.on("create_room", (creatorName: string) => {
         creator: creatorName,
         players: gameManager.players,
         spectators: gameManager.spectators,
+        userIp: [],
         gameState: {
             board: gameManager.board,
             currentPlayer: gameManager.currentPlayer
         }
     };
     let room = rooms[roomId];
+    room.userIp.push(returnUserIp() as string)
     room.players?.push(creatorName);
     socket.join(roomId);
     socket.emit("room_created",roomId);
@@ -60,6 +60,7 @@ socket.on("create_room", (creatorName: string) => {
 })
 
 socket.on("join_room",(data: {roomId: string, userName: string, role: "player" | "spectator"}) => {
+    console.log(socket.id);
     const room = rooms[data.roomId];
     if(!room) {
         socket.emit('error', "Room Does Not Exist");
@@ -147,10 +148,7 @@ socket.on("disconnect", () => {
 })
 
 })
-
-
 const PORT = 8001;
-
 server.listen(PORT,() => {
     console.log("server is live....")
 })
