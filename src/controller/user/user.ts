@@ -89,14 +89,30 @@ export const changeUsernameById = async(req:IGetUserAuthInfoRequest,res:Response
 }
 
 export const changeUserOnline = async(req:IGetUserAuthInfoRequest,res:Response,next:NextFunction) => {
-    const user = await getuser(req)
+    let user = await getuser(req)
     if(!user) {
         throw new BadRequestError("user not found",null);
     }
     if (user.online === true) {
-        await prismaClient.user.update({where:{id: user.id},data: {online: false}})
+        user = await prismaClient.user.update({where:{id: user.id},data: {online: false}})
+        res.json({
+            message: "user is online",
+            success: true,
+            data: {
+                username: user.username,
+                online: user.online 
+            }
+        })
     }else {
-        await prismaClient.user.update({where:{id: user.id},data: {online: true}})
+       user =  await prismaClient.user.update({where:{id: user.id},data: {online: true}})
+     return res.json({
+        message: "user is online",
+        success: true,
+        data: {
+            username: user.username,
+            online: user.online 
+        }
+    })
     }
 }
 
@@ -113,14 +129,12 @@ export const findOnlineUsers = async(req:IGetUserAuthInfoRequest,res:Response,ne
     orderBy: {
         id: "desc"
     }})
-    if(!results) {
-        throw new NotFound("No user is online for now",null)
-    }
+    const filteredResult = results.filter((data) =>  data.id !== req.user?.id)
     res.json({
         message: "users available",
         success: true,
         data: {
-            onlineUsers: results
+            onlineUsers: filteredResult
         }
     })
 }

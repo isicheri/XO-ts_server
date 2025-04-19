@@ -6,6 +6,6 @@ import roomRouter from "./room/room";
 const indexRouter:Router = Router();
 indexRouter.use("/auth",authRouter);
 indexRouter.use("/user",userRouter);
-indexRouter.use("/room/",roomRouter)
+indexRouter.use("/room",roomRouter)
 
 export default indexRouter;

@@ -1,10 +1,11 @@
-import { prismaClient } from "..";
-import { GameManager, UserInterface } from "./gameManager";
+import { GameManager } from "./gameManager";
+import { User } from "./user";
 
+export type OutgoingMessage = unknown;
 
 export class RoomManager {
 
-room: Map<number,GameManager> = new Map();
+room: Map<string,GameManager> = new Map();
 static instance: RoomManager;
   
 private constructor() {
@@ -14,18 +15,46 @@ private constructor() {
 
 static getInstance() {
     if(!this.instance) {
-        this.instance = new RoomManager();
+      this.instance = new RoomManager();
     }
     return this.instance;
 }
 
-async addSpectator(roomId:number,user:UserInterface[]) {
-    let prismaRoom = await prismaClient.room.findFirst({where: {id: roomId}}); 
-    if(this.room.get(roomId)?.spectators.length === 50) {
-        console.log("room is full")
-    }
-this.room.get(roomId)?.spectators.push(...user);
-}
+  joinRoom(as: "player" | "spectator",user:User,roomId: string) {
+    if(!this.room.has(roomId)) {
+        this.room.set(roomId,new GameManager())
+        this.room.get(roomId)?.players.push(user)
+        return;
+    }else {
+    if(as === "player") {
+   if(this.room.get(roomId)?.players.length === 2) {
+     this.room.get(roomId)?.spectators.push(user)
+   }
+   this.room.get(roomId)?.players.push(user)
+   }else if(as === "spectator"){
+     if(this.room.get(roomId)?.spectators.length === 50) {
+       return;
+     }
+     this.room.get(roomId)?.spectators.push(user)
+   }else {
+    return;
+   }
+    }   
+  }
 
+  leaveRoom(user:User,roomId:string) {
+    let currentRoom =  this.room.get(roomId);
+    if(!currentRoom?.players.includes(user)) {
+      currentRoom?.spectators.filter((data) => data !== user)
+      return
+    }else {
+        this.room.delete(roomId);
+        return 
+    }
+  }
+
+  moves() {}
+
+   broadCastMessage(message: OutgoingMessage,user:User,roomId:string) {}
 
 }

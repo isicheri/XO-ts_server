@@ -1,12 +1,12 @@
-export interface UserInterface {
-  username: string;
-}
+import { User } from "./user";
+
 
 export class GameManager {
     board: string[][];
-    players: UserInterface[];
+
+    players: User[];
     currentPlayer: number;
-    spectators: UserInterface[]
+    spectators: User[];
 
     constructor() {
      this.board = [

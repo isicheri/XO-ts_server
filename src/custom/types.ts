@@ -7,8 +7,8 @@ export enum ErrorCode {
 }
 
 export enum Role {
-    USER,
-    ADMIN
+    USER = "USER",
+    ADMIN = "ADMIN"
 }
 
 export interface UserJwtPayload  {
