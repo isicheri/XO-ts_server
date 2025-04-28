@@ -1,7 +1,8 @@
 import { GameManager } from "./gameManager";
 import { User } from "./user";
 
-export type OutgoingMessage = unknown;
+export type OutgoingMessage = any;
+export type GameMove = {row:number,col:number,symbol: "X" | "O"}
 
 export class RoomManager {
 
@@ -53,8 +54,26 @@ static getInstance() {
     }
   }
 
-  moves() {}
+  moves(roomId:string,user:User,move: GameMove) {
+    if(!this.room.has(roomId)) {
+      return;
+    }
+    const currentRoom = this.room.get(roomId);
+    currentRoom?.updateBoard(user,move)
+  }
 
-   broadCastMessage(message: OutgoingMessage,user:User,roomId:string) {}
+   broadCastMessage(message: OutgoingMessage,user:User,roomId:string) {
+    if(!this.room.has(roomId)) {
+      return;
+    }
+      const players:Array<User>  | undefined = this.room.get(roomId)?.players;
+      const spectators:Array<User> | undefined = this.room.get(roomId)?.spectators;
+      const allUsers = [...players!,...spectators!];
+       allUsers.forEach(u => {
+        if(u.id !== user.id) {
+          u.send(JSON.parse(message))
+        }
+       })
+   }
 
 }

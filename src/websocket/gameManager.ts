@@ -1,11 +1,11 @@
+import { GameMove } from "./roomManager";
 import { User } from "./user";
 
 
 export class GameManager {
     board: string[][];
-
     players: User[];
-    currentPlayer: number;
+    playerSymbol: string | undefined;
     spectators: User[];
 
     constructor() {
@@ -15,7 +15,7 @@ export class GameManager {
         [' ',' ',' ']
     ];
      this.players = [];
-     this.currentPlayer = 0;
+     this.playerSymbol = undefined;
      this.spectators = []
     }
 
@@ -41,6 +41,11 @@ export class GameManager {
    }
 
     return null;
+  }
+
+
+  updateBoard(user:User,gameMove:GameMove) {
+    let {row,col,symbol} = gameMove;
   }
 
 }

@@ -5,6 +5,7 @@ import { PrismaClient } from '../src/generated/prisma/client'
 import indexRouter from "./routes";
 import { errorMiddleware, requestLogger } from "./middleware/custom.middleware";
 import { PORT } from "./custom/secret";
+import { User } from "./websocket/user";
 const app:Express = express();
 const wss = new WebSocketServer({port: 8008})
 app.use(express.json())
@@ -16,10 +17,11 @@ export const prismaClient = new PrismaClient({
 });
 wss.on("connection",(ws) => {
     ws.on("error",console.error)
-    ws.on("message",(data) => {
-        console.log("message recieved: ",data)
-    })
-    // ws.on("open",() => {})
+    let user:User;
+      user = new User(ws)
+      ws.on("message",(data) => {
+        user.initializer()
+      })
 })
 app.use(errorMiddleware)
 app.listen(PORT,() => {
