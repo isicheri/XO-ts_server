@@ -46,6 +46,23 @@ export class GameManager {
 
   updateBoard(user:User,gameMove:GameMove) {
     let {row,col,symbol} = gameMove;
+    if(!this.players.includes(user)) {
+      return;
+    }
+    if(this.board[row][col] !== ' ') {
+     return;
+    }
+    this.board[row][col] = symbol;
+  }
+
+  checkBoard() {
+    let winner = this.checkWinner()
+    if(winner) {
+      return winner
+    }else {
+      console.log("keep playing");
+      return !winner;
+    }
   }
 
 }

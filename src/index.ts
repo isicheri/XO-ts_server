@@ -7,7 +7,7 @@ import { errorMiddleware, requestLogger } from "./middleware/custom.middleware";
 import { PORT } from "./custom/secret";
 import { User } from "./websocket/user";
 const app:Express = express();
-const wss = new WebSocketServer({port: 8008})
+const wss = new WebSocketServer({port: 8080})
 app.use(express.json())
 app.use(helmet())
 app.use(requestLogger)
